@@ -1,0 +1,161 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bahir Dar University | Registration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/styles.css">
+  <style>
+    .registration-page{min-height:100vh;background:var(--paper)}
+    .registration-header-shell{background:#fff;border-bottom:1px solid var(--line);padding:18px 5vw 12px;position:relative;z-index:2}
+    .registration-banner-title{max-width:1280px;margin:0 auto;padding:0;color:#111;font:700 clamp(1.3rem,2vw,2.2rem)/1.1 'Space Grotesk',sans-serif;letter-spacing:-.04em;text-transform:none;background:transparent}
+    .registration-banner-title span{display:inline}
+    .registration-header{max-width:1280px;margin:0 auto;padding:10px 0 0;display:flex;justify-content:flex-start}
+    .registration-header .text-link{display:inline-block;color:#111;text-decoration:none;border-bottom:1px solid rgba(17,17,17,.7);font-size:14px;font-weight:700;line-height:1.1;padding:0 0 4px}
+    .registration-header .text-link:hover{color:var(--orange)}
+    .registration-wrap{max-width:1050px;margin:auto;padding:70px 5vw 110px}.registration-intro{display:flex;justify-content:space-between;align-items:end;gap:40px;margin-bottom:52px;position:relative;isolation:isolate}.registration-intro::before{content:'';position:absolute;z-index:-1;inset:-55px -5vw -24px;background:url('/registration-watermark.jpg.jfif') center/cover no-repeat;opacity:.9;pointer-events:none}.registration-intro h1,.registration-intro>p,.registration-intro .eyebrow{position:relative;z-index:1}.registration-intro h1{font:600 clamp(3rem,7vw,6.5rem)/.9 var(--display);letter-spacing:-.08em;margin:0}.registration-intro h1 em{font-style:normal;color:var(--orange)}.registration-intro>p{max-width:270px;color:var(--muted);font-size:14px;margin:0 0 5px;background:rgba(244,241,235,.92);padding:7px 9px}.form-shell{background:#fff;border:1px solid var(--line);padding:38px}.form-section{border-top:1px solid var(--line);padding:35px 0 8px}.form-section:first-child{border-top:0;padding-top:0}.form-section h2{font:600 27px var(--display);letter-spacing:-.05em;margin:0 0 22px}.form-section h2 span{color:var(--orange);font-size:11px;letter-spacing:.1em;vertical-align:middle;margin-left:8px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 24px}.field{display:block;margin:12px 0}.field.full{grid-column:1/-1}.field>span{display:block;font-size:11px;font-weight:700;margin-bottom:5px}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:var(--paper);padding:12px 13px;color:var(--ink);outline:0;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,118,89,.14)}.field small{display:block;color:var(--muted);font-size:10px;font-weight:400;margin-top:5px}.checks{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:12px 0}.check{display:flex;gap:10px;align-items:flex-start;color:var(--ink);font-size:13px}.check input{accent-color:var(--orange);width:16px;height:16px;margin:1px 0 0}.form-foot{display:flex;align-items:center;gap:20px;border-top:1px solid var(--line);padding-top:28px;margin-top:20px}.form-foot .button{border:0}.form-message{font-size:13px;color:var(--muted);margin:0}.form-message.success{color:#2d7a4c}.form-message.error{color:#bd3e3e}.required-note{color:var(--muted);font-size:11px;margin:0 0 22px}.registration-page.dark{--paper:#191c19;--ink:#f4f1eb;--line:#3b403a;--muted:#adb2aa}.registration-page.dark .site-header,.registration-page.dark .form-shell{background:#242824}.registration-page.dark .field input,.registration-page.dark .field select,.registration-page.dark .field textarea{background:#191c19;color:var(--ink)}@media(max-width:700px){.registration-wrap{padding:45px 6vw 80px}.registration-intro{display:block}.registration-intro::before{inset:-35px -6vw -20px;background-position:center}.registration-intro>p{margin-top:25px}.form-shell{padding:24px 18px}.form-grid,.checks{grid-template-columns:1fr}.field.full{grid-column:auto}.form-foot{display:block}.form-foot .button{width:100%;justify-content:space-between}.form-message{margin-top:15px}}
+  </style>
+</head>
+<body class="registration-page">
+  <header class="registration-header-shell">
+    <div class="registration-banner-title">Innovation Center</div>
+    <div class="registration-header">
+      <a class="text-link" href="/">Back home</a>
+    </div>
+  </header>
+  <main class="registration-wrap"><div class="registration-intro"><div><p class="eyebrow">Bahir Dar University Innovation Center</p><h1>Start with an<br><em>idea.</em></h1></div><p>Your application is the first step toward building, learning, and contributing with a community of student innovators.</p></div>
+    <form id="applicant-form" class="form-shell" novalidate>
+      <p class="required-note">Fields marked * are required.</p>
+
+      <section class="form-section">
+        <h2>Applicant information <span>01</span></h2>
+        <div class="form-grid">
+          <label class="field"><span>First name *</span><input name="firstName" required /></label>
+          <label class="field"><span>Middle name</span><input name="middleName" /></label>
+          <label class="field"><span>Last name *</span><input name="lastName" required /></label>
+          <label class="field"><span>Age *</span><input name="age" type="number" min="1" required /></label>
+          <label class="field"><span>Sex/Gender *</span><input name="gender" required /></label>
+          <label class="field"><span>Phone number *</span><input name="phoneNumber" type="tel" required /></label>
+          <label class="field"><span>University ID *</span><input name="universityId" required /></label>
+          <label class="field"><span>Department *</span><input name="department" required /></label>
+          <label class="field"><span>Email address *</span><input name="emailAddress" type="email" required /></label>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <h2>Application questions <span>02</span></h2>
+        <div class="form-grid">
+          <label class="field full"><span>Why would you join the Innovation Center? (max 300 words) *</span><textarea name="whyJoin" rows="3" maxlength="2000" required></textarea></label>
+          <label class="field full"><span>Project title *</span><input name="projectTitle" required /></label>
+          <label class="field full"><span>Explain your project idea (max 300 words) *</span><textarea name="projectIdea" rows="4" maxlength="2000" required></textarea></label>
+          <label class="field full"><span>Past projects or experiences (max 300 words) *</span><textarea name="pastProjects" rows="3" maxlength="2000" required></textarea></label>
+          <label class="field full"><span>What contribution will you make to the Innovation Center? (max 300 words) *</span><textarea name="contribution" rows="3" maxlength="2000" required></textarea></label>
+          <label class="field full"><span>Describe your teamwork experience (max 300 words) *</span><textarea name="teamworkExperience" rows="3" maxlength="2000" required></textarea></label>
+          <label class="field full"><span>What problem does your project solve? (max 300 words) *</span><textarea name="projectProblem" rows="3" maxlength="2000" required></textarea></label>
+          <label class="field full"><span>Who benefits from your project? (max 300 words) *</span><textarea name="beneficiaries" rows="3" maxlength="2000" required></textarea></label>
+          <label class="field full"><span>What resources do you need to develop your project? (max 300 words) *</span><textarea name="resourcesNeeded" rows="3" maxlength="2000" required></textarea></label>
+          <label class="field full"><span>Have you participated in innovation competitions before? (max 300 words) *</span><textarea name="competitionHistory" rows="3" maxlength="2000" required></textarea></label>
+          <label class="field full"><span>What skills do you bring to the team? (max 300 words) *</span><textarea name="skills" rows="3" maxlength="2000" required></textarea></label>
+          <label class="field full"><span>Where do you see your project in 5 years? (max 300 words) *</span><textarea name="projectFiveYearPlan" rows="3" maxlength="2000" required></textarea></label>
+        </div>
+      </section>
+
+      <div class="form-foot">
+        <button class="button" type="submit">Submit registration <span>→</span></button>
+        <p id="form-status" class="form-message" role="status"></p>
+      </div>
+    </form>
+  </main>
+  <script>
+    const form = document.getElementById('applicant-form');
+    const status = document.getElementById('form-status');
+
+    const countWords = (value = '') => (value.trim() ? value.trim().split(/\s+/).length : 0);
+
+    const validateWordLimit = (fieldName, maxWords = 300) => {
+      const value = form.elements[fieldName].value || '';
+      const wordCount = countWords(value);
+      if (wordCount > maxWords) {
+        const label = form.elements[fieldName].closest('.field')?.querySelector('span')?.textContent || fieldName;
+        throw new Error(`${label.replace(/\s*\(max 300 words\)\s*\*?/, '').trim()} must be 300 words or less.`);
+      }
+    };
+
+    const buildPayload = (formData) => {
+      const firstName = formData.get('firstName') || '';
+      const middleName = formData.get('middleName') || '';
+      const lastName = formData.get('lastName') || '';
+      const gender = formData.get('gender') || '';
+      const age = formData.get('age') || '';
+      const phoneNumber = formData.get('phoneNumber') || '';
+      const universityId = formData.get('universityId') || '';
+      const department = formData.get('department') || '';
+      const emailAddress = (formData.get('emailAddress') || '').trim().toLowerCase();
+
+      return {
+        name: [firstName, middleName, lastName].filter(Boolean).join(' ').trim(),
+        firstName,
+        middleName,
+        lastName,
+        age,
+        gender,
+        department,
+        phone: phoneNumber,
+        phoneNumber,
+        schoolId: universityId,
+        universityId,
+        email: emailAddress,
+        emailAddress,
+        whyJoin: formData.get('whyJoin') || '',
+        projectTitle: formData.get('projectTitle') || '',
+        projectIdea: formData.get('projectIdea') || '',
+        pastProjects: formData.get('pastProjects') || '',
+        contribution: formData.get('contribution') || '',
+        teamworkExperience: formData.get('teamworkExperience') || '',
+        projectProblem: formData.get('projectProblem') || '',
+        beneficiaries: formData.get('beneficiaries') || '',
+        resourcesNeeded: formData.get('resourcesNeeded') || '',
+        competitionHistory: formData.get('competitionHistory') || '',
+        skills: formData.get('skills') || '',
+        projectFiveYearPlan: formData.get('projectFiveYearPlan') || '',
+        motivation: formData.get('whyJoin') || '',
+        projectDetails: formData.get('projectIdea') || '',
+        contributionReason: formData.get('contribution') || '',
+        policyAgreement: true,
+        createdAt: new Date().toISOString()
+      };
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+
+      try {
+        ['whyJoin','projectIdea','pastProjects','contribution','teamworkExperience','projectProblem','beneficiaries','resourcesNeeded','competitionHistory','skills','projectFiveYearPlan'].forEach((fieldName) => validateWordLimit(fieldName, 300));
+
+        const payload = buildPayload(formData);
+        status.textContent = 'Submitting your application...';
+        status.className = 'form-message';
+
+        const response = await fetch('/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.message || 'Please check the form and try again.');
+        }
+
+        status.textContent = result.message || 'Registration received. Welcome to the Innovation Center.';
+        status.className = 'form-message success';
+        form.reset();
+      } catch (error) {
+        status.textContent = error.message || 'Please check the form and try again.';
+        status.className = 'form-message error';
+      }
+    });
+
+  </script>
+</body>
+</html>
+
