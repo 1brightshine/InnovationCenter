@@ -12,8 +12,11 @@ const googleScriptUrl = process.env.GOOGLE_SCRIPT_URL || '';
 const registrations = [];
 
 function saveRegistration(registration) {
-  const duplicateExists = registrations.some((student) => student.schoolId && registration.schoolId && student.schoolId === registration.schoolId) ||
-    registrations.some((student) => student.email && registration.email && student.email === registration.email);
+  const duplicateExists = registrations.some((student) => {
+    const existingSchoolId = typeof student.schoolId === 'string' ? student.schoolId.trim() : '';
+    const incomingSchoolId = typeof registration.schoolId === 'string' ? registration.schoolId.trim() : '';
+    return existingSchoolId && incomingSchoolId && existingSchoolId === incomingSchoolId;
+  });
 
   if (duplicateExists) {
     throw new Error('That School ID is already registered.');
