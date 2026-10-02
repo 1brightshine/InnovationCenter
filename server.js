@@ -4,47 +4,51 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
 
 const app = express();
 const port = process.env.PORT || 3000;
 const jwtSecret = process.env.JWT_SECRET || 'innovation-center-local-secret';
+const googleScriptUrl = process.env.GOOGLE_SCRIPT_URL || '';
 const registrations = [];
-const studentSchema = new mongoose.Schema({
-  name: String,
-  schoolId: { type: String, unique: true, sparse: true },
-  email: String,
-  phone: String,
-  department: String,
-  interests: String,
-  projectIdea: String,
-  pastProjects: String,
-  contributionReason: String,
-  projectDetails: String,
-  teamworkExperience: String,
-  motivation: String,
-  skills: String,
-  innovationDomain: String,
-  leadershipExperience: String,
-  collaborationStyle: String,
-  timeCommitment: String,
-  mentorshipInterest: Boolean,
-  eventPresentation: Boolean,
-  publicationExperience: String,
-  languages: String,
-  internationalCollaboration: String,
-  entrepreneurshipInterest: Boolean,
-  technicalKnowledge: String,
-  communicationPlatform: String,
-  competitionExperience: String,
-  innovationStrengths: String,
-  improvementAreas: String,
-  careerGoals: String,
-  communityImpact: String,
-  policyAgreement: Boolean,
-  createdAt: { type: Date, default: Date.now }
-}, { strict: false });
-const Student = mongoose.model('Student', studentSchema);
+
+function saveRegistration(registration) {
+  const duplicateExists = registrations.some((student) => student.schoolId && registration.schoolId && student.schoolId === registration.schoolId) ||
+    registrations.some((student) => student.email && registration.email && student.email === registration.email);
+
+  if (duplicateExists) {
+    throw new Error('That School ID is already registered.');
+  }
+
+  registrations.push(registration);
+}
+
+function getStudentsFromSource() {
+  return [...registrations].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+}
+
+async function sendToGoogleSheet(registration) {
+  if (!googleScriptUrl) {
+    return;
+  }
+
+  try {
+    const response = await fetch(googleScriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(registration)
+    });
+
+    const text = await response.text();
+    if (!response.ok) {
+      console.error('Google Apps Script submit failed:', response.status, text);
+      return;
+    }
+
+    console.log('Registration synced to Google Sheets:', text);
+  } catch (error) {
+    console.error('Google Sheets sync error:', error.message);
+  }
+}
 
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors());
@@ -82,19 +86,13 @@ app.post('/register', async (req, res) => {
     createdAt: new Date().toISOString()
   };
 
-  if (mongoose.connection.readyState === 1) {
-    try {
-      await Student.create(registration);
-    } catch (error) {
-      if (error.code === 11000) return res.status(409).json({ message: 'That School ID is already registered.' });
-      return res.status(500).json({ message: 'Registration could not be saved.' });
-    }
-  } else {
-    if (registration.schoolId && registrations.some((student) => student.schoolId === registration.schoolId)) {
-      return res.status(409).json({ message: 'That School ID is already registered.' });
-    }
-    registrations.push(registration);
+  try {
+    saveRegistration(registration);
+    await sendToGoogleSheet(registration);
+  } catch (error) {
+    return res.status(error.message === 'That School ID is already registered.' ? 409 : 500).json({ message: error.message || 'Registration could not be saved.' });
   }
+
   res.status(201).json({ message: 'Registration received. Welcome to the Innovation Center.' });
 });
 
@@ -118,13 +116,12 @@ function requireAdmin(req, res, next) {
   }
 }
 
-app.get('/students', requireAdmin, async (_req, res) => {
-  const students = mongoose.connection.readyState === 1 ? await Student.find().sort({ createdAt: -1 }).lean() : registrations;
-  res.json(students);
+app.get('/students', requireAdmin, (_req, res) => {
+  res.json(getStudentsFromSource());
 });
 
-app.get('/students/export', requireAdmin, async (_req, res) => {
-  const students = mongoose.connection.readyState === 1 ? await Student.find().sort({ createdAt: -1 }).lean() : registrations;
+app.get('/students/export', requireAdmin, (_req, res) => {
+  const students = getStudentsFromSource();
   const keys = Array.from(new Set(students.flatMap((student) => Object.keys(student)))).sort();
   const escapeCsv = (value) => {
     const stringValue = value == null ? '' : String(value);
@@ -143,9 +140,5 @@ app.get('*', (_req, res) => {
 
 app.listen(port, () => {
   console.log(`Innovation Center running at http://localhost:${port}`);
-  if (process.env.MONGODB_URI) {
-    mongoose.connect(process.env.MONGODB_URI)
-      .then(() => console.log('Connected to MongoDB Atlas'))
-      .catch((error) => console.error(`MongoDB unavailable; using local fallback: ${error.message}`));
-  }
+  console.log('Using Google Sheets as the applicant data store.');
 });
