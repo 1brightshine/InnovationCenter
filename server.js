@@ -10,18 +10,27 @@ const port = process.env.PORT || 3000;
 const jwtSecret = process.env.JWT_SECRET || 'innovation-center-local-secret';
 const googleScriptUrl = process.env.GOOGLE_SCRIPT_URL || '';
 const registrations = [];
+const pendingSchoolIds = new Set();
 
-function saveRegistration(registration) {
-  const duplicateExists = registrations.some((student) => {
-    const existingSchoolId = typeof student.schoolId === 'string' ? student.schoolId.trim() : '';
-    const incomingSchoolId = typeof registration.schoolId === 'string' ? registration.schoolId.trim() : '';
-    return existingSchoolId && incomingSchoolId && existingSchoolId === incomingSchoolId;
-  });
+function reserveRegistration(registration) {
+  const schoolId = typeof registration.schoolId === 'string' ? registration.schoolId.trim() : '';
+  const duplicateExists = schoolId && (
+    pendingSchoolIds.has(schoolId) ||
+    registrations.some((student) => {
+      const existingSchoolId = typeof student.schoolId === 'string' ? student.schoolId.trim() : '';
+      return existingSchoolId === schoolId;
+    })
+  );
 
   if (duplicateExists) {
     throw new Error('That School ID is already registered.');
   }
 
+  if (schoolId) pendingSchoolIds.add(schoolId);
+  return schoolId;
+}
+
+function saveRegistration(registration) {
   registrations.push(registration);
 }
 
@@ -31,26 +40,42 @@ function getStudentsFromSource() {
 
 async function sendToGoogleSheet(registration) {
   if (!googleScriptUrl) {
-    return;
+    throw new Error('Google Sheets is not configured.');
   }
 
+  const response = await fetch(googleScriptUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(registration)
+  });
+
+  const text = await response.text();
+  if (!response.ok) {
+    throw new Error(`Google Sheets returned HTTP ${response.status}.`);
+  }
+
+  if (!text.trim() || (response.headers.get('content-type') || '').includes('text/html')) {
+    throw new Error('Google Sheets did not confirm the registration.');
+  }
+
+  let result;
   try {
-    const response = await fetch(googleScriptUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(registration)
-    });
-
-    const text = await response.text();
-    if (!response.ok) {
-      console.error('Google Apps Script submit failed:', response.status, text);
-      return;
-    }
-
-    console.log('Registration synced to Google Sheets:', text);
-  } catch (error) {
-    console.error('Google Sheets sync error:', error.message);
+    result = JSON.parse(text);
+  } catch {
+    result = null;
   }
+
+  if (
+    result?.success === false ||
+    result?.ok === false ||
+    String(result?.status || '').toLowerCase() === 'error' ||
+    result?.error ||
+    /^(error|failed)\b/i.test(text.trim())
+  ) {
+    throw new Error('Google Sheets rejected the registration.');
+  }
+
+  console.log('Registration synced to Google Sheets.');
 }
 
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -89,11 +114,19 @@ app.post('/register', async (req, res) => {
     createdAt: new Date().toISOString()
   };
 
+  let reservedSchoolId = '';
   try {
-    saveRegistration(registration);
+    reservedSchoolId = reserveRegistration(registration);
     await sendToGoogleSheet(registration);
+    saveRegistration(registration);
   } catch (error) {
-    return res.status(error.message === 'That School ID is already registered.' ? 409 : 500).json({ message: error.message || 'Registration could not be saved.' });
+    if (error.message === 'That School ID is already registered.') {
+      return res.status(409).json({ message: error.message });
+    }
+    console.error('Registration persistence failed:', error.message);
+    return res.status(502).json({ message: 'Your application could not be saved to Google Sheets. Please try again later.' });
+  } finally {
+    if (reservedSchoolId) pendingSchoolIds.delete(reservedSchoolId);
   }
 
   res.status(201).json({ message: 'Registration received. Welcome to the Innovation Center.' });
@@ -141,7 +174,11 @@ app.get('*', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(port, () => {
-  console.log(`Innovation Center running at http://localhost:${port}`);
-  console.log('Using Google Sheets as the applicant data store.');
-});
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`Innovation Center running at http://localhost:${port}`);
+    console.log(googleScriptUrl ? 'Google Sheets persistence is configured.' : 'Google Sheets persistence is not configured.');
+  });
+}
+
+module.exports = app;
